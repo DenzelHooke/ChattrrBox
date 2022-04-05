@@ -6,7 +6,8 @@ const http = require("http");
 const { errorHandler } = require("./middleware/errorMiddlware");
 const {connectDB} = require("./config/db");
 const colors = require('colors'); 
-import { users as currentUsers } from './processes/chat';
+const { handleSocketValidation } = require("./handlers/socketHander");
+const users = require('./processes/chat');
 
 
 
@@ -15,8 +16,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    origin: '*'
   }
 });
 
@@ -39,7 +39,22 @@ app.use(express.urlencoded({ extended: false }));
 // Socket handling
 io.on('connection', (socket) => {
   console.log('User has connected.');
+
+  //Runs when user connects
+  socket.on('assign', ({ token, username }) => {
+    console.log('handler hit');
+    //Check if token is valid
+    const valid = handleSocketValidation(token, username);
+    //Add user to users list if valid.
+    if(!valid) return;
+    
+    users.push([...users, {}])
+
+  })
+
+  // On joinRoom message
   socket.on('joinRoom', ({ room }) => {
+    console.log(room)
     socket.join(room.toLowerCase())
   })
 
