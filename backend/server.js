@@ -7,9 +7,10 @@ const { errorHandler } = require("./middleware/errorMiddlware");
 const {connectDB} = require("./config/db");
 const colors = require('colors'); 
 const { handleSocketValidation } = require("./handlers/socketHander");
+const { userJoin, userFind, changeRoom, userRemove, getUsersInRoom } = require("./handlers/userHandler");
 const users = require('./processes/chat');
 
-
+const BOT_NAME = 'ChattrBot'
 
 connectDB()
 const app = express();
@@ -38,29 +39,137 @@ app.use(express.urlencoded({ extended: false }));
 
 // Socket handling
 io.on('connection', (socket) => {
-  console.log('User has connected.');
-
+  console.log('user connected')
   //Runs when user connects
-  socket.on('assign', ({ token, username }) => {
-    console.log('handler hit');
+  socket.on('init', async ({ token, username, room }) => {
+    //* INIT
+
+    const socketID = socket.id;
     //Check if token is valid
-    const valid = handleSocketValidation(token, username);
+    const valid = await handleSocketValidation(token, username, room, socketID);
     //Add user to users list if valid.
-    if(!valid) return;
+    if(!valid) {
+      socket.emit('tokenInvalid')
+      return
+    }
+    // Add user to array
+    // Returns true if user is already in users array(Already connected to a room)
     
-    users.push([...users, {}])
-
+    //?It's virtually impossible for the socket to be added into the array twice but extra safety is better than none.
+    const alreadyExists = userJoin(valid, socketID);
+    if(!alreadyExists) {
+      socket.join(valid.room);
+      //Send new user list to room
+      io.in(valid.room).emit(
+        'usersList',
+        {
+          users: getUsersInRoom(valid.room)
+        }
+      )
+      
+      //Send join message to all sockets in the init room (general).
+      socket.to(valid.room).emit('message', { 
+        username: BOT_NAME, 
+        message:`${valid.username} has joined`,
+        flag: 'BOT'
+      })
+    } else{
+      console.log('User already exists in chat.')
+    }
   })
-
+  
   // On joinRoom message
-  socket.on('joinRoom', ({ room }) => {
-    console.log(room)
-    socket.join(room.toLowerCase())
+  socket.on('joinRoom', ({ newRoom, currentRoom }) => {
+    console.log(`Join Room Hit`);
+    let user = userFind(socket.id);
+    console.log('Socket before change:', socket.rooms)
+
+    //Check if user is trying to switch to their current room.
+    if(user.room === newRoom) {
+      return;
+    } 
+
+    //* Leave Phase
+
+    const socketID = socket.id;
+    socket.leave(currentRoom);
+    changeRoom(newRoom, socketID);
+
+    //Emit message to old room.
+    socket.to(currentRoom).emit('message', { 
+      username: BOT_NAME, 
+      message:`${user.username} has left chat`,
+      flag: 'BOT'
+    })
+
+    //Send new user list to old room
+    io.in(currentRoom).emit(
+      'usersList',
+      {
+        users: getUsersInRoom(currentRoom)
+      }
+    )
+    
+    //* Join Phase
+
+    socket.join(newRoom);
+    console.log('Socket after change:', socket.rooms)
+
+    user = userFind(socketID);
+    
+    socket.to(user.room).emit('message', { 
+      username: BOT_NAME, 
+      message:`${user.username} has joined`,
+      flag: 'BOT'
+    })
+    
+    //Send new user list to new room
+    io.in(user.room).emit(
+      'usersList',
+      {
+        users: getUsersInRoom(newRoom)
+      }
+    )
   })
 
   socket.on('message', message => {
-    console.log(message)
-    io.emit('message', { username: message.user.username, message: message.message });
+    const socketID = socket.id;
+    const user = userFind(socketID);
+    // console.log(`Message hit: ${user}`)
+    // console.log(user)
+    // console.log(message)
+    io.in(user.room).emit(
+      'message', 
+      {
+         username: user.username, 
+         message: message.message 
+      }
+    );
+  })
+
+  socket.on('disconnect', () => {
+    const socketID = socket.id;
+    const user = userRemove(socketID);
+    
+    if(user) {
+      //Send message to all users
+      io.in(user.room).emit(
+        'message',
+        {
+          username: BOT_NAME, 
+          message:`${user.username} has left the chat`,
+          flag: 'BOT'
+        }
+      )
+
+      //Send new user list
+      io.to(user.room).emit(
+        'usersList',
+        {
+          users: getUsersInRoom(user.room)
+        }
+      )
+    }
   })
 });
 

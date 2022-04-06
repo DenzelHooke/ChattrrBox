@@ -1,19 +1,21 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
-const handleSocketValidation = async (token, username) => {
+const handleSocketValidation = async (token, username, room, socketID) => {
   
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
 
-    
     //Returns the entire document except the password field.
     const user = await User.findById(decoded.id).select('-password')
     if(user) {
-      console.log(user)
+      // console.log('token valid')
+      //Returns once user resolves.
       return {
-        ...user,
+        _id: decoded.id,
+        socketID: socketID,
+        username: username,
+        room: room,
       }
     }
   } catch (error) {
