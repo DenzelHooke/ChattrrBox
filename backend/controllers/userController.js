@@ -83,6 +83,7 @@ const loginUser = asyncHandler( async(req, res) => {
     })
   } else {
     res.status(401)
+    console.log(req.password)
     throw new Error('Username or email is incorrent');
   }
 } )

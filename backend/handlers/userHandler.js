@@ -56,10 +56,28 @@ const getUsersInRoom = (room) => {
   return inRoom;
 }
 
+const cleanUpOldSockets = (username) => {
+  //Loops through arr and checks for duplicat6e objects that share the same username.
+
+  // console.log(users)
+  // console.log(username)
+  if(users.length > 0) {
+    // console.log('checking arr')
+    for(let i=0; i<users.length; i++) {
+      if (users[i].username.toLowerCase() == username) {
+        console.log(users[i])
+        const index = users.indexOf(users[i]);
+        users.splice(index, 1);
+      }
+    }
+  }
+}
+
 module.exports = {
   userJoin,
   userFind,
   changeRoom,
   userRemove,
   getUsersInRoom,
+  cleanUpOldSockets,
 }

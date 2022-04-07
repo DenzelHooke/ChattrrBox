@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const dotenv = require("dotenv").config();
 const socketio = require("socket.io");
 const cors = require("cors");
@@ -7,7 +8,14 @@ const { errorHandler } = require("./middleware/errorMiddlware");
 const {connectDB} = require("./config/db");
 const colors = require('colors'); 
 const { handleSocketValidation } = require("./handlers/socketHander");
-const { userJoin, userFind, changeRoom, userRemove, getUsersInRoom } = require("./handlers/userHandler");
+const {
+   userJoin, 
+   userFind, 
+   changeRoom, 
+   userRemove, 
+   getUsersInRoom, 
+   cleanUpOldSockets 
+  } = require("./handlers/userHandler");
 const users = require('./processes/chat');
 
 const BOT_NAME = 'ChattrBot'
@@ -15,21 +23,31 @@ const BOT_NAME = 'ChattrBot'
 connectDB()
 const app = express();
 const server = http.createServer(app);
+
+const corsAllowed = (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.header('Access-Control-Allow-Methods', 'GET,POST');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+}
+
+
 const io = socketio(server, {
   cors: {
-    origin: '*'
+    origin: 'http://localhost:3000'
   }
 });
 
 var corsOptions = {
-  origin: '*',
+  origin: 'http://localhost:3000',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
 
 
 //Set middleware
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(corsAllowed)
 // Allows us to parse json req body.
 app.use(express.json());
 // Allows us to parse urlencoded req body.
@@ -39,10 +57,15 @@ app.use(express.urlencoded({ extended: false }));
 
 // Socket handling
 io.on('connection', (socket) => {
+  
   console.log('user connected')
   //Runs when user connects
   socket.on('init', async ({ token, username, room }) => {
     //* INIT
+
+    // Clean up old users with same usersnames but different sockets.
+    cleanUpOldSockets(username.toLowerCase());
+
 
     const socketID = socket.id;
     //Check if token is valid
@@ -184,6 +207,18 @@ io.on('connection', (socket) => {
 app.use('/api/users/', require('./routes/userRoutes'));
 app.use('/api/chat/', require('./routes/chatRoutes'));
 
+// Serve production
+
+if(process.env.NODE_ENV === 'production'){
+  //* Set static to our react build folder.
+  app.use(express.static(path.join(__dirname, '../frontend/build')))
+
+  // Any route asside for the api routes, send this file.
+  app.get('*', (req, res) => res.sendFile(
+    path.resolve(__dirname, '../', 'frontend', 'build', 'index.html')
+    )
+  )
+}
 
 
 //Overwrite default Error handler.
