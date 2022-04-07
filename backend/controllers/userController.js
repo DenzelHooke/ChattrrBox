@@ -73,7 +73,7 @@ const loginUser = asyncHandler( async(req, res) => {
 
   // Little bit of regex which says the match should contain the username as the entire match regardless of case-sensitivity.
   const user = await User.findOne({ username: { $regex: `${username}`, $options: 'i' } });
-  console.log(user)
+
   if (user &&  await bcrypt.compare(password, user.password)) {
     res.status(200).json({
       _id: user.id,
@@ -83,7 +83,6 @@ const loginUser = asyncHandler( async(req, res) => {
     })
   } else {
     res.status(401)
-    console.log(req.password)
     throw new Error('Username or email is incorrent');
   }
 } )
