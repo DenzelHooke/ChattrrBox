@@ -50,6 +50,7 @@ io.on('connection', (socket) => {
     //Add user to users list if valid.
     if(!valid) {
       socket.emit('tokenInvalid')
+      socket.disconnect();
       return
     }
     // Add user to array
