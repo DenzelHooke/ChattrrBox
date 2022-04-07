@@ -90,6 +90,10 @@ io.on('connection', (socket) => {
       return;
     } 
 
+    //Wipe old text on frontend
+
+    socket.emit('wipe')
+
     //* Leave Phase
 
     const socketID = socket.id;
