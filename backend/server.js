@@ -34,7 +34,7 @@ const corsAllowed = (req, res, next) => {
 
 const io = socketio(server, {
   cors: {
-    origin: 'https://chattrrbox.herokuapp.com/'
+    origin: '*'
   }
 });
 
