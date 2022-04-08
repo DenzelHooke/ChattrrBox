@@ -35,7 +35,7 @@ function Chat() {
   useEffect(() => {
     if(user){
 
-      socketRef.current = io.connect('http://localhost:8080');
+      socketRef.current = io.connect('https://chattrrbox.herokuapp.com');
       
       //* Send identifiable user info to server
       socketRef.current.emit('init', { token: user.token, username: user.username, room: room.toLowerCase() });
