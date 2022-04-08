@@ -34,13 +34,13 @@ const corsAllowed = (req, res, next) => {
 
 const io = socketio(server, {
   cors: {
-    origin: 'https://chattrrbox.herokuapp.com/',
+    origin: '*',
     methods: ["GET", "POST"]
   }
 });
 
 var corsOptions = {
-  origin: 'https://chattrrbox.herokuapp.com/',
+  origin:  '*',
   methods: ["GET", "POST"],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
