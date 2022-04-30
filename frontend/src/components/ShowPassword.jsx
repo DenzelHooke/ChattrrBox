@@ -22,8 +22,7 @@ function ShowPassword() {
         :
         <BsFillEyeSlashFill size={30} />
       }
-      <span></span>
-      <input type="checkbox"  onClick={onClick}  />
+      <input type="checkbox"  onClick={onClick} />
     </label>
   )
 }

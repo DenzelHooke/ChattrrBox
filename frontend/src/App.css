@@ -26,7 +26,9 @@
   -moz-osx-font-smoothing: antialiased; */
 }
 
-
+input:focus {
+  outline: 0;
+}
 
 h1,
 h2,
@@ -199,10 +201,14 @@ a{
   justify-content: center;
   align-items: center;
   position: relative;
-  width: 45px;
+  width: auto;
   align-self: stretch;
   background: rgb(237, 237, 237);
   cursor: pointer;
+}
+
+.checkbox input {
+  display: none;
 }
 
 
