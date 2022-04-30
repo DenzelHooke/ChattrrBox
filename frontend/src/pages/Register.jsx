@@ -49,6 +49,8 @@ function Register() {
     if(password !== password2) {
       toast.error('Passwords do not match');
       setFormData({...formData, password: '', password2:''});
+    } else if ( !password || !password2 || !username || !email){
+      toast.error('Please fill in all fields.');
     } else {
       //Send data to backend.
       const userData = {
