@@ -31,7 +31,6 @@ const corsAllowed = (req, res, next) => {
   next();
 }
 
-
 const io = socketio(server, {
   cors: {
     origin: '*',
