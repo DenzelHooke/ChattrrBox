@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600&family=Poppins:wght@100;200;300;400;500;600;700&display=swap");
+
 :root {
   /* CSS HEX */
   --bdazzled-blue: #3d5a80ff;
@@ -6,6 +7,7 @@
   --light-cyan: #e0fbfcff;
   --burnt-sienna: #ee6c4dff;
   --gunmetal: #293241ff;
+
   --flat-green: #54ce5c;
   --gap-blue: #154975;
   --flat-baby-blue: #dbf2ff;
@@ -56,8 +58,10 @@ a {
   padding: 0 10px;
 }
 
-#logo span {
-  font-weight: 200;
+#logo {
+  span {
+    font-weight: 200;
+  }
 }
 
 .navbar ul {
@@ -147,17 +151,7 @@ a {
   align-items: center;
   height: 100vh;
   padding-bottom: 20%;
-  -webkit-animation: loadingInit 150ms ease-in-out;
-          animation: loadingInit 150ms ease-in-out;
-}
-
-@-webkit-keyframes loadingInit {
-  0% {
-    opacity: 0%;
-  }
-  100% {
-    opacity: 100%;
-  }
+  animation: loadingInit 150ms ease-in-out;
 }
 
 @keyframes loadingInit {
@@ -168,6 +162,7 @@ a {
     opacity: 100%;
   }
 }
+
 .btn {
   background: none;
   border: none;
@@ -180,8 +175,7 @@ a {
   border-radius: 50%;
   width: 125px;
   height: 125px;
-  -webkit-animation: spin 1.5s linear infinite;
-          animation: spin 1.5s linear infinite;
+  animation: spin 1.5s linear infinite;
 }
 
 #password {
@@ -196,7 +190,8 @@ a {
 }
 
 /* show password */
-.password [type=checkbox] {
+
+.password [type="checkbox"] {
   opacity: 0;
   width: 0;
   height: 0;
@@ -218,15 +213,6 @@ a {
   display: none;
 }
 
-@-webkit-keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -234,4 +220,4 @@ a {
   100% {
     transform: rotate(360deg);
   }
-}/*# sourceMappingURL=App.css.map */
+}

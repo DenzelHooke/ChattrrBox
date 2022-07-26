@@ -1,30 +1,23 @@
-import { useState } from 'react'
-import { BsFillEyeSlashFill, BsFillEyeFill } from 'react-icons/bs'
+import { useState } from "react";
+import { BsFillEyeSlashFill, BsFillEyeFill } from "react-icons/bs";
 
 function ShowPassword() {
-  const [clicked, setClicked] = useState(false)
+  const [clicked, setClicked] = useState(false);
 
   const onClick = (e) => {
-    const input = document.querySelector('#password');
-    setClicked(!clicked)
-    if(input.type === 'password') {
-      input.type = 'text';
+    const input = document.querySelector("#password");
+    setClicked(!clicked);
+    if (input.type === "password") {
+      input.type = "text";
     } else {
-      input.type = 'password'
+      input.type = "password";
     }
-  }
+  };
   return (
-    <label className="checkbox">
-      {
-        clicked
-        ? 
-        <BsFillEyeFill size={30} />
-        :
-        <BsFillEyeSlashFill size={30} />
-      }
-      <input type="checkbox"  onClick={onClick} />
-    </label>
-  )
+    <div className="checkbox" onClick={onClick}>
+      {clicked ? <BsFillEyeFill size={30} /> : <BsFillEyeSlashFill size={30} />}
+    </div>
+  );
 }
 
-export default ShowPassword
+export default ShowPassword;

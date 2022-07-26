@@ -15,10 +15,10 @@ function Navbar() {
 
   return (
     <div className="navbar">
-      <h1>
+      <h1 id="logo">
         <Link to="/">
           <AiOutlineWechat color={"#4EAFE5"} />
-          ChatterBox
+          <span>Chatter</span>Box
         </Link>
       </h1>
       <ul>
